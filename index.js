@@ -14,23 +14,87 @@ server.get("/api/users", (req, res) => {
     })
     .catch(err => {
       console.log(err);
-      res.status(500).json({ errorMessage: "Wrong!" });
+      res.status(500).json({
+        errorMessage: "The users information could not be retrieved."
+      });
     });
   res.status(200);
 });
 
+// add new user
 server.post("/api/users", (req, res) => {
   const userInfo = req.body;
   console.log("this is the body", req.body);
 
-  Users.insert(userInfo)
+  if (!userInfo.name || !userInfo.bio) {
+    res.status(404).json({ message: "Please provide name and bio for user" });
+  } else {
+    Users.insert(userInfo)
+      .then(user => {
+        res.status(201).json(user);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({
+          errorMessage:
+            "There was an error while saving the user to the database"
+        });
+      });
+  }
+});
+
+//find user object with specified id
+server.get("/api/users/:id", (req, res) => {
+  const { id } = req.params;
+  Users.findById(id)
     .then(user => {
-      res.status(201).json(user);
+      res.status(200).json(user);
     })
     .catch(err => {
       console.log(err);
-      res.status(500).json({ errorMessage: "wrong!" });
+      res.status(500).json({
+        errorMessage: "The user information could not be retrieved."
+      });
     });
+});
+
+//Deletes the user by id and returns deleted user
+server.delete("/api/users/:id", (req, res) => {
+  const { id } = req.params;
+  const deleted = req.body;
+  if (!id) {
+    res.status(404).json({
+      errorMessage: "The user with the specified ID does not exist"
+    });
+  } else {
+    Users.remove(id)
+      .then(removed => {
+        res.status(200).json(removed);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({ errorMessage: "not good" });
+      });
+  }
+});
+
+//Updates the user by id and returns the modified document
+server.put("/api/users/:id", (req, res) => {
+  const { id } = req.params;
+  const updatedUser = req.body;
+
+  if (!userInfo.name || !userInfo.bio) {
+    res.status(404).json({ message: "Please provide name and bio for user" });
+  } else {
+    Users.update(id, updatedUser)
+      .then(user => {
+        res.status(200).json(updatedUser);
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({ errorMessage: "not good" });
+      });
+  }
 });
 
 const port = 5000;
