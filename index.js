@@ -1,3 +1,7 @@
+//Add dotenv to deploy
+require("dotenv").config();
+const port = process.env.PORT || 5000;
+
 // implement your API here
 const express = require("express");
 const server = express();
@@ -103,5 +107,4 @@ server.put("/api/users/:id", (req, res) => {
     });
 });
 
-const port = 5000;
 server.listen(port, () => console.log(`\n** API on port ${port}\n`));
